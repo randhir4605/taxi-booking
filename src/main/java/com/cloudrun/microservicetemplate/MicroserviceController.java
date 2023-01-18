@@ -23,6 +23,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
 /** Example REST controller to demonstrate structured logging. */
 @RestController
 public class MicroserviceController {
@@ -31,6 +45,9 @@ public class MicroserviceController {
   // https://cloud.spring.io/spring-cloud-gcp/multi/multi__stackdriver_logging.html
   private static final Logger logger = LoggerFactory.getLogger(MicroserviceController.class);
 
+  @Autowired
+	EmployeeRepository repository;
+  
   /** Example endpoint handler. */
   @GetMapping("/")
   public @ResponseBody String index() {
@@ -42,4 +59,19 @@ public class MicroserviceController {
     logger.info("Structured logging example.");
     return "Hello World!";
   }
+
+  @GetMapping("emp/create")
+	public ModelAndView renderCreateForm(){
+		ModelAndView mv=new ModelAndView();
+		Employee employee=new Employee();
+		mv.addObject(employee);
+		mv.setViewName("employee_create");
+		return mv;
+	}
+
+  @PostMapping("emp/create")
+	public String createEmployee(@ModelAttribute("employee") Employee emp){
+		repository.save(emp);
+		return "redirect:/emp/all";
+	}
 }
